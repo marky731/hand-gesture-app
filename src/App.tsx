@@ -75,10 +75,10 @@ const App: React.FC = () => {
                 console.log(`Section Change Detected: X=${sectionX}, Y=${sectionY}`);
   
                 if (sectionY === 0) { // Top row
-                  if (sectionX === 0) {
+                  if (sectionX === 2) {
                     console.log("Playing previous song");
                     playPreviousSong(); // Play previous song
-                  } else if (sectionX === 2) {
+                  } else if (sectionX === 0) {
                     console.log("Playing next song");
                     playNextSong(); // Play next song
                   }
