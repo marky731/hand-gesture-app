@@ -8,8 +8,8 @@ const App: React.FC = () => {
   const [audioPlayer, setAudioPlayer] = useState<HTMLAudioElement | null>(null);
   const [currentSongIndex, setCurrentSongIndex] = useState<number>(0);
   const [lastSection, setLastSection] = useState<{ x: number; y: number } | null>(null);
-  const [isDebouncing, setIsDebouncing] = useState(false);
-  
+  const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
+
   const songs = [
     'song1.mp3',
     'song2.mp3',
@@ -70,8 +70,8 @@ const App: React.FC = () => {
   
             // Check if the hand is in a new section
             if (lastSection?.x !== sectionX || lastSection?.y !== sectionY) {
-              // Only trigger changes if not debouncing
-              if (!isDebouncing) {
+              // Only trigger changes if the debounce is not active
+              if (!debounceTimeout.current) {
                 console.log(`Section Change Detected: X=${sectionX}, Y=${sectionY}`);
   
                 if (sectionY === 0) { // Top row
@@ -84,19 +84,14 @@ const App: React.FC = () => {
                   }
                 }
   
+                // Set debounce timeout
+                debounceTimeout.current = setTimeout(() => {
+                  debounceTimeout.current = null; // Reset debounce
+                }, 1700); // Debounce time (5 seconds)
+
                 // Update the last section
                 setLastSection({ x: sectionX, y: sectionY });
-                setIsDebouncing(true); // Start debouncing
-  
-                // Set a timeout to reset the debounce
-                setTimeout(() => {
-                  setIsDebouncing(false);
-                  setLastSection(null); // Reset lastSection after debounce
-                }, 1000); // Debounce time (1 second)
               }
-            } else {
-              // If the hand stays in the same section, reset lastSection
-              setLastSection({ x: sectionX, y: sectionY });
             }
           } else {
             // Reset lastSection when no hand is detected
@@ -111,7 +106,7 @@ const App: React.FC = () => {
     };
   
     detectHand();
-  }, [lastSection, isDebouncing]);
+  }, [lastSection]);
   
   const playAudio = (song: string) => {
     if (audioPlayer) {
