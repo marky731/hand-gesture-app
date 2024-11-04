@@ -44,9 +44,13 @@ const App: React.FC = () => {
       const handpose = await import('@tensorflow-models/handpose');
       const net = await handpose.load();
       const video = videoRef.current!;
-      const ctx = canvasRef.current!.getContext('2d');
+        const ctx = canvasRef.current!.getContext('2d');
+        const iconImage = new Image();
+        iconImage.src = 'https://cdn3.iconfinder.com/data/icons/player-ui-1/48/net-512.png'; // Icon-Dateipfad (URL oder Base64-kodiertes Bild)
 
-      let frameCount = 0;
+
+        let frameCount = 0;
+        let progress = 0; // Fortschrittsvariable für die rotierende Scheibe
 
       const detect = async () => {
         if (video.readyState === video.HAVE_ENOUGH_DATA) {
@@ -54,22 +58,66 @@ const App: React.FC = () => {
           ctx!.translate(canvasRef.current!.width, 0);
           ctx!.scale(-1, 1);
           ctx!.drawImage(video, 0, 0, canvasRef.current!.width, canvasRef.current!.height);
-          ctx!.setTransform(1, 0, 0, 1, 0, 0);
+            ctx!.setTransform(1, 0, 0, 1, 0, 0);
+
+            const frameWidth = canvasRef.current!.width;
+            const frameHeight = canvasRef.current!.height;
+
+            // Divide the frame into 3 columns and 2 rows
+            const sectionWidth = frameWidth / 3;
+            const sectionHeight = frameHeight / 2;
+
+
+            // Vertikale Linien (Spalten)
+            for (let i = 1; i < 3; i++) {
+                ctx!.beginPath();
+                ctx!.moveTo(i * sectionWidth, 0);
+                ctx!.lineTo(i * sectionWidth, frameHeight);
+                ctx!.stroke();
+            }
+
+            // Horizontale Linien (Reihen)
+            for (let j = 1; j < 2; j++) {
+                ctx!.beginPath();
+                ctx!.moveTo(0, j * sectionHeight);
+                ctx!.lineTo(frameWidth, j * sectionHeight);
+                ctx!.stroke();
+            }
+
+            // Icon in der rechten oberen Sektion zeichnen
+            ctx!.globalAlpha = 0.5; // Setzt Transparenz auf 50%
+            const iconX = sectionWidth * 2 + (sectionWidth / 2) - 16; // Position in der Mitte der rechten oberen Sektion
+            const iconY = sectionHeight / 2 - 16; // Position im oberen Abschnitt der rechten oberen Sektion
+            ctx!.drawImage(iconImage, iconX, iconY, 32, 32); // Zeichnet das Icon mit 32x32 Pixeln
+            ctx!.globalAlpha = 1.0; // Setzt die Transparenz wieder auf 100%
+
+
+            // Fortschrittsring um das Icon zeichnen
+            const radius = 24; // Radius der Scheibe um das Icon
+            const startAngle = -Math.PI / 2; // Startwinkel (oben)
+            const endAngle = startAngle + (progress / 100) * 2 * Math.PI; // Fortschrittswinkel
+
+            ctx!.globalAlpha = 0.5;
+            ctx!.beginPath();
+            ctx!.arc(iconX + 16, iconY + 16, radius, startAngle, endAngle);
+            ctx!.strokeStyle = 'blue';
+            ctx!.lineWidth = 4;
+            ctx!.stroke();
+            ctx!.globalAlpha = 1.0;
+
+            // Fortschritt erhöhen (für das Drehen)
+            progress = (progress + 2) % 100; // Erhöht den Fortschritt und startet bei 100% neu
+
 
           // Run detection every 5 frames
-          if (frameCount % 5 === 0) {
+          if (frameCount % 10 === 0) {
             const predictions: AnnotatedPrediction[] = await net.estimateHands(video); // Await predictions here
 
             if (predictions.length > 0) {
               const hand = predictions[0].boundingBox;
               const handCenterX = (hand.topLeft[0] + hand.bottomRight[0]) / 2;
               const handCenterY = (hand.topLeft[1] + hand.bottomRight[1]) / 2;
-              const frameWidth = canvasRef.current!.width;
-              const frameHeight = canvasRef.current!.height;
-
-              // Divide the frame into 3 columns and 2 rows
-              const sectionWidth = frameWidth / 3;
-              const sectionHeight = frameHeight / 2;
+          
 
               // Determine the section of the hand
               const sectionX = Math.floor(handCenterX / sectionWidth);
