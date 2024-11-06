@@ -137,9 +137,9 @@ const App: React.FC = () => {
     ];
 
     const sections = [
-        new Section("LefTop",0, 0, 200, 240, 'https://cdn3.iconfinder.com/data/icons/player-ui-1/48/net-512.png'),
+        new Section("LefTop",0, 0, 200, 240, 'https://cdn2.iconfinder.com/data/icons/music-player-black/32/music_player_black-06-1024.png'),
         //new Section(220, 0, 440, 240, 'https://cdn3.iconfinder.com/data/icons/player-ui-1/48/net-512.png'),
-        new Section("RightTop",460, 0, 640, 240, 'https://cdn3.iconfinder.com/data/icons/player-ui-1/48/net-512.png'),
+        new Section("RightTop",460, 0, 640, 240, 'https://cdn2.iconfinder.com/data/icons/music-player-black/32/music_player_black-05-512.png'),
         //new Section(0, 250, 320, 480, 'https://cdn3.iconfinder.com/data/icons/player-ui-1/48/net-512.png'),
         //new Section(340, 250, 640, 480, 'https://cdn3.iconfinder.com/data/icons/player-ui-1/48/net-512.png')
     ];
