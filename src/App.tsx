@@ -134,7 +134,16 @@ const App: React.FC = () => {
     const songs = [
         'song1.mp3', 'song2.mp3', 'song3.mp3', 'song4.mp3', 'song5.mp3',
         'song6.mp3', 'song7.mp3', 'song8.mp3', 'song9.mp3', 'song10.mp3',
+        'song11.mp3', 'song12.mp3', 'song13.mp3', 'song14.mp3', 'song15.mp3',
     ];
+
+    const activeSongRef = useRef<HTMLLIElement | null>(null); // Ref für den aktiven Song
+
+    useEffect(() => {
+        if (activeSongRef.current) {
+            activeSongRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }, [currentSongIndex]);
 
     const sections = [
         new Section("LefTop",0, 0, 200, 240, 'https://cdn2.iconfinder.com/data/icons/music-player-black/32/music_player_black-06-1024.png'),
@@ -242,10 +251,36 @@ const App: React.FC = () => {
 
     return (
         <div className="App">
-            <video ref={videoRef} style={{ display: 'none' }} />
-            <canvas ref={canvasRef} width={640} height={480} />
+            <h1 className="app-title">Hand Gesture Music Player</h1>
+            <div className="content">
+                <div className="video-container">
+                    <video ref={videoRef} style={{ display: 'none' }} />
+                    <canvas ref={canvasRef} width={640} height={480} />
+
+                    
+                </div>
+
+
+                <div className="right-container">
+                    <h2>Songs:</h2>
+             
+                    <div className="song-list">
+                    
+                        <ul>
+                            {songs.map((song, index) => (
+                                <li
+                                    key={index}
+                                    ref={index === currentSongIndex ? activeSongRef : null}
+                                    className={index === currentSongIndex ? 'active-song' : ''}
+                                >
+                                    {song}
+                                </li>
+                            ))}
+                        </ul>
+                        </div>
+                </div>
+            </div>
             <div className="audio-player">
-                <p>Now Playing: {songs[currentSongIndex]}</p>
                 <audio controls>
                     <source src={`/audio/${songs[currentSongIndex]}`} type="audio/mp3" />
                     Your browser does not support the audio tag.
