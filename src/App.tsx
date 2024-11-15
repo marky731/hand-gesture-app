@@ -148,8 +148,8 @@ const App: React.FC = () => {
         new Section("LefTop",0, 0, 200, 240, 'https://cdn2.iconfinder.com/data/icons/music-player-black/32/music_player_black-06-1024.png'),
         new Section("RightTop",460, 0, 640, 240, 'https://cdn2.iconfinder.com/data/icons/music-player-black/32/music_player_black-05-512.png'),
         new Section("Middle", 200, 0, 460, 480, 'https://cdn3.iconfinder.com/data/icons/player-ui-1/48/net-512.png'),
-        new Section("LeftButtom", 0, 250, 200, 480, 'https://cdn3.iconfinder.com/data/icons/player-ui-1/48/net-512.png'),
-        new Section("RightButtom",  460, 250, 640, 480, 'https://cdn3.iconfinder.com/data/icons/player-ui-1/48/net-512.png')
+        new Section("LeftButtom", 0, 241, 200, 480, 'https://cdn4.iconfinder.com/data/icons/user-interface-solid-black/22/volume_up_down_increase_decrease_mute_speaker_1-512.png'),
+        new Section("RightButtom",  460, 241, 640, 480, 'https://cdn4.iconfinder.com/data/icons/user-interface-solid-black/22/volume_up_down_increase_decrease_mute_speaker_2-512.png')
     ];
 
     useEffect(() => {
@@ -245,11 +245,14 @@ const App: React.FC = () => {
         console.log("-Current audioPlayer state:", audioPlayerRef.current);
         console.log("-Requested song:", song);
     
+        // Check if the audio is already playing the requested song
         if (audioPlayerRef.current) {
             if (audioPlayerRef.current.src.includes(song)) {
                 console.log("Toggling play/pause for the current song");
                 if (audioPlayerRef.current.paused) {
-                    audioPlayerRef.current.play();
+                    audioPlayerRef.current.play().catch((error) => {
+                        console.error("Error while playing audio:", error);
+                    });
                 } else {
                     audioPlayerRef.current.pause();
                 }
@@ -262,14 +265,31 @@ const App: React.FC = () => {
         }
     
         console.log("Playing new song:", song);
-        audioPlayerRef.current = new Audio(`/audio/${song}`);
-        audioPlayerRef.current.play();
+    
+        // Stop the previous song (if any) before starting a new one
+        const newAudioPlayer = new Audio(`/audio/${song}`);
+        
+        // Set up event listeners to ensure play works once the new song is ready
+        newAudioPlayer.oncanplaythrough = () => {
+            // Pause any current audio and ensure we have one active audio player at a time
+            if (audioPlayerRef.current) {
+                audioPlayerRef.current.pause();
+            }
+    
+            // Assign the new audio player and play the song
+            audioPlayerRef.current = newAudioPlayer;
+            audioPlayerRef.current.play().catch((error) => {
+                console.error("Error while playing new audio:", error);
+            });
+        };
+    
+        newAudioPlayer.onerror = (error) => {
+            console.error("Audio load error:", error);
+        };
     };
     
     
     
-    
-
     const playPreviousSong = () => {
         setCurrentSongIndex((prevIndex) => {
             const newIndex = (prevIndex - 1 + songs.length) % songs.length;
