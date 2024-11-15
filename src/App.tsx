@@ -137,7 +137,7 @@ const App: React.FC = () => {
         'song11.mp3', 'song12.mp3', 'song13.mp3', 'song14.mp3', 'song15.mp3',
     ];
 
-    const activeSongRef = useRef<HTMLLIElement | null>(null); // Ref für den aktiven Song
+    const activeSongRef = useRef<HTMLLIElement | null>(null); // Ref fï¿½r den aktiven Song
 
     useEffect(() => {
         if (activeSongRef.current) {
@@ -147,10 +147,10 @@ const App: React.FC = () => {
 
     const sections = [
         new Section("LefTop",0, 0, 200, 240, 'https://cdn2.iconfinder.com/data/icons/music-player-black/32/music_player_black-06-1024.png'),
-        //new Section(220, 0, 440, 240, 'https://cdn3.iconfinder.com/data/icons/player-ui-1/48/net-512.png'),
         new Section("RightTop",460, 0, 640, 240, 'https://cdn2.iconfinder.com/data/icons/music-player-black/32/music_player_black-05-512.png'),
-        //new Section(0, 250, 320, 480, 'https://cdn3.iconfinder.com/data/icons/player-ui-1/48/net-512.png'),
-        //new Section(340, 250, 640, 480, 'https://cdn3.iconfinder.com/data/icons/player-ui-1/48/net-512.png')
+        new Section("Middle", 200, 0, 460, 480, 'https://cdn3.iconfinder.com/data/icons/player-ui-1/48/net-512.png'),
+        new Section("LeftButtom", 0, 250, 200, 480, 'https://cdn3.iconfinder.com/data/icons/player-ui-1/48/net-512.png'),
+        new Section("RightButtom",  460, 250, 640, 480, 'https://cdn3.iconfinder.com/data/icons/player-ui-1/48/net-512.png')
     ];
 
     useEffect(() => {
