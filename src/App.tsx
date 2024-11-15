@@ -129,14 +129,15 @@ const App: React.FC = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [audioPlayer, setAudioPlayer] = useState<HTMLAudioElement | null>(null);
+    const audioPlayerRef = useRef<HTMLAudioElement | null>(null); // Add this line
+
     const [currentSongIndex, setCurrentSongIndex] = useState<number>(0);
 
     const songs = [
         'song1.mp3', 'song2.mp3', 'song3.mp3', 'song4.mp3', 'song5.mp3'
     ];
 
-    const activeSongRef = useRef<HTMLLIElement | null>(null); // Ref f�r den aktiven Song
-
+    const activeSongRef = useRef<HTMLLIElement | null>(null); // Ref for the active song
     useEffect(() => {
         if (activeSongRef.current) {
             activeSongRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -201,19 +202,24 @@ const App: React.FC = () => {
                                     {
                                         if (section.name == "LefTop") playPreviousSong();
                                         if (section.name == "RightTop") playNextSong();
-                                        if (section.name == "Middle") 
-                                        {
-                                            if (audioPlayer) 
-                                            {
-                                                if (audioPlayer.paused) 
-                                                {
-                                                    audioPlayer.play();
-                                                } else 
-                                                {
-                                                    audioPlayer.pause();
+                                        if (section.name == "Middle") {
+                                            console.log("Middle section triggered");
+                                            if (audioPlayerRef.current) {
+                                                console.log("Current audioPlayer is present. Checking state...");
+                                                if (audioPlayerRef.current.paused) {
+                                                    console.log("Audio is paused. Playing...");
+                                                    audioPlayerRef.current.play();
+                                                } else {
+                                                    console.log("Audio is playing. Pausing...");
+                                                    audioPlayerRef.current.pause();
                                                 }
+                                            } else {
+                                                console.log("No audioPlayer instance found. Playing the current song.");
+                                                playAudio(songs[currentSongIndex]);
                                             }
                                         }
+                                        
+                                                                        
                                     }
                                 } else {
                                     section.resetProgress();
@@ -236,40 +242,60 @@ const App: React.FC = () => {
     }, []);
 
     const playAudio = (song: string) => {
-        if (audioPlayer) {
-            if (audioPlayer.src.includes(song)) {
-                // Toggle play/pause if the same song is clicked
-                if (audioPlayer.paused) {
-                    audioPlayer.play();
+        console.log("Current audioPlayer state:", audioPlayerRef.current);
+        console.log("Requested song:", song);
+    
+        if (audioPlayerRef.current) {
+            if (audioPlayerRef.current.src.includes(song)) {
+                console.log("Toggling play/pause for the current song");
+                if (audioPlayerRef.current.paused) {
+                    audioPlayerRef.current.play();
                 } else {
-                    audioPlayer.pause();
+                    audioPlayerRef.current.pause();
                 }
                 return;
+            } else {
+                console.log("Pausing the currently playing song");
+                audioPlayerRef.current.pause();
+                audioPlayerRef.current.src = ''; // Clear the source to stop playback
             }
-            audioPlayer.pause();
         }
     
-        const newAudioPlayer = new Audio(`/audio/${song}`);
-        newAudioPlayer.play();
-        setAudioPlayer(newAudioPlayer);
+        console.log("Playing new song:", song);
+        audioPlayerRef.current = new Audio(`/audio/${song}`);
+        audioPlayerRef.current.play();
     };
+    
+    
+    
     
 
     const playPreviousSong = () => {
+        if (audioPlayer) {
+            audioPlayer.pause();
+            audioPlayer.src = ''; // Ensure the current song is stopped
+        }
+    
         setCurrentSongIndex((prevIndex) => {
             const newIndex = (prevIndex - 1 + songs.length) % songs.length;
             playAudio(songs[newIndex]);
             return newIndex;
         });
     };
-
+    
     const playNextSong = () => {
+        if (audioPlayer) {
+            audioPlayer.pause();
+            audioPlayer.src = ''; // Ensure the current song is stopped
+        }
+    
         setCurrentSongIndex((prevIndex) => {
             const newIndex = (prevIndex + 1) % songs.length;
             playAudio(songs[newIndex]);
             return newIndex;
         });
     };
+    
 
     return (
         <div className="App">
