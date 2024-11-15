@@ -132,9 +132,7 @@ const App: React.FC = () => {
     const [currentSongIndex, setCurrentSongIndex] = useState<number>(0);
 
     const songs = [
-        'song1.mp3', 'song2.mp3', 'song3.mp3', 'song4.mp3', 'song5.mp3',
-        'song6.mp3', 'song7.mp3', 'song8.mp3', 'song9.mp3', 'song10.mp3',
-        'song11.mp3', 'song12.mp3', 'song13.mp3', 'song14.mp3', 'song15.mp3',
+        'song1.mp3', 'song2.mp3', 'song3.mp3', 'song4.mp3', 'song5.mp3'
     ];
 
     const activeSongRef = useRef<HTMLLIElement | null>(null); // Ref f�r den aktiven Song
@@ -197,10 +195,25 @@ const App: React.FC = () => {
                             const handCenterY = (hand.topLeft[1] + hand.bottomRight[1]) / 2;
 
                             sections.forEach((section) => {
-                                if (section.contains(handCenterX, handCenterY)) {
-                                    if (section.progressing()) {
+                                if (section.contains(handCenterX, handCenterY))
+                                {
+                                    if (section.progressing()) 
+                                    {
                                         if (section.name == "LefTop") playPreviousSong();
                                         if (section.name == "RightTop") playNextSong();
+                                        if (section.name == "Middle") 
+                                        {
+                                            if (audioPlayer) 
+                                            {
+                                                if (audioPlayer.paused) 
+                                                {
+                                                    audioPlayer.play();
+                                                } else 
+                                                {
+                                                    audioPlayer.pause();
+                                                }
+                                            }
+                                        }
                                     }
                                 } else {
                                     section.resetProgress();
@@ -224,14 +237,23 @@ const App: React.FC = () => {
 
     const playAudio = (song: string) => {
         if (audioPlayer) {
+            if (audioPlayer.src.includes(song)) {
+                // Toggle play/pause if the same song is clicked
+                if (audioPlayer.paused) {
+                    audioPlayer.play();
+                } else {
+                    audioPlayer.pause();
+                }
+                return;
+            }
             audioPlayer.pause();
-            audioPlayer.currentTime = 0;
         }
-
+    
         const newAudioPlayer = new Audio(`/audio/${song}`);
         newAudioPlayer.play();
         setAudioPlayer(newAudioPlayer);
     };
+    
 
     const playPreviousSong = () => {
         setCurrentSongIndex((prevIndex) => {
@@ -283,7 +305,6 @@ const App: React.FC = () => {
             <div className="audio-player">
                 <audio controls>
                     <source src={`/audio/${songs[currentSongIndex]}`} type="audio/mp3" />
-                    Your browser does not support the audio tag.
                 </audio>
             </div>
         </div>
