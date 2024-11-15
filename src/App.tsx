@@ -13,7 +13,7 @@ class Section {
     private progress: number;
     private debounceTimeout: NodeJS.Timeout | null;
     private selectionStart: number | null = null;
-    private millisecondsTrigger: number = 1500;
+    private millisecondsTrigger: number = 1000;
     private millisecondsDebounce: number = 500;
     constructor(name: string, x1: number, y1: number, x2: number, y2: number, iconSrc: string) {
         this._name = name;
@@ -203,14 +203,14 @@ const App: React.FC = () => {
                                         if (section.name == "LefTop") playPreviousSong();
                                         if (section.name == "RightTop") playNextSong();
                                         if (section.name == "Middle") {
-                                            console.log("Middle section triggered");
+                                            console.log("--Middle section triggered--");
                                             if (audioPlayerRef.current) {
-                                                console.log("Current audioPlayer is present. Checking state...");
+                                                console.log("(Current audioPlayer is present)");
                                                 if (audioPlayerRef.current.paused) {
-                                                    console.log("Audio is paused. Playing...");
+                                                    console.log("Playing...");
                                                     audioPlayerRef.current.play();
                                                 } else {
-                                                    console.log("Audio is playing. Pausing...");
+                                                    console.log("Pausing...");
                                                     audioPlayerRef.current.pause();
                                                 }
                                             } else {
@@ -242,8 +242,8 @@ const App: React.FC = () => {
     }, []);
 
     const playAudio = (song: string) => {
-        console.log("Current audioPlayer state:", audioPlayerRef.current);
-        console.log("Requested song:", song);
+        console.log("-Current audioPlayer state:", audioPlayerRef.current);
+        console.log("-Requested song:", song);
     
         if (audioPlayerRef.current) {
             if (audioPlayerRef.current.src.includes(song)) {
@@ -271,11 +271,6 @@ const App: React.FC = () => {
     
 
     const playPreviousSong = () => {
-        if (audioPlayer) {
-            audioPlayer.pause();
-            audioPlayer.src = ''; // Ensure the current song is stopped
-        }
-    
         setCurrentSongIndex((prevIndex) => {
             const newIndex = (prevIndex - 1 + songs.length) % songs.length;
             playAudio(songs[newIndex]);
@@ -284,11 +279,6 @@ const App: React.FC = () => {
     };
     
     const playNextSong = () => {
-        if (audioPlayer) {
-            audioPlayer.pause();
-            audioPlayer.src = ''; // Ensure the current song is stopped
-        }
-    
         setCurrentSongIndex((prevIndex) => {
             const newIndex = (prevIndex + 1) % songs.length;
             playAudio(songs[newIndex]);
