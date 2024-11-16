@@ -147,7 +147,7 @@ const App: React.FC = () => {
     const sections = [
         new Section("LefTop",0, 0, 200, 240, 'https://cdn2.iconfinder.com/data/icons/music-player-black/32/music_player_black-06-1024.png'),
         new Section("RightTop",460, 0, 640, 240, 'https://cdn2.iconfinder.com/data/icons/music-player-black/32/music_player_black-05-512.png'),
-        new Section("Middle", 200, 0, 460, 480, 'https://cdn3.iconfinder.com/data/icons/player-ui-1/48/net-512.png'),
+        new Section("Middle", 200, 0, 460, 480, 'https://cdn3.iconfinder.com/data/icons/fluent-solid-24px-vol-8/24/ic_fluent_video_play_pause_24_filled-512.png'),
         new Section("LeftButtom", 0, 241, 200, 480, 'https://cdn4.iconfinder.com/data/icons/user-interface-solid-black/22/volume_up_down_increase_decrease_mute_speaker_1-512.png'),
         new Section("RightButtom",  460, 241, 640, 480, 'https://cdn4.iconfinder.com/data/icons/user-interface-solid-black/22/volume_up_down_increase_decrease_mute_speaker_2-512.png')
     ];
