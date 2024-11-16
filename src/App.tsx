@@ -242,13 +242,22 @@ const App: React.FC = () => {
     }, []);
 
     const playAudio = (song: string) => {
-        console.log("-Current audioPlayer state:", audioPlayerRef.current);
         console.log("-Requested song:", song);
     
-        // Check if the audio is already playing the requested song
         if (audioPlayerRef.current) {
-            if (audioPlayerRef.current.src.includes(song)) {
-                console.log("Toggling play/pause for the current song");
+            // Check if the new song is different from the current one
+            if (!audioPlayerRef.current.src.includes(song)) {
+                audioPlayerRef.current.src = `/audio/${song}`;
+                audioPlayerRef.current.load(); // Reload the audio source
+    
+                // Wait until the audio can play through before playing
+                audioPlayerRef.current.oncanplaythrough = () => {
+                    audioPlayerRef.current?.play().catch((error) => {
+                        console.error("Error while auto-playing audio:", error);
+                    });
+                };
+            } else {
+                // If the same song is selected, toggle play/pause
                 if (audioPlayerRef.current.paused) {
                     audioPlayerRef.current.play().catch((error) => {
                         console.error("Error while playing audio:", error);
@@ -256,38 +265,9 @@ const App: React.FC = () => {
                 } else {
                     audioPlayerRef.current.pause();
                 }
-                return;
-            } else {
-                console.log("Pausing the currently playing song");
-                audioPlayerRef.current.pause();
-                audioPlayerRef.current.src = ''; // Clear the source to stop playback
             }
         }
-    
-        console.log("Playing new song:", song);
-    
-        // Stop the previous song (if any) before starting a new one
-        const newAudioPlayer = new Audio(`/audio/${song}`);
-        
-        // Set up event listeners to ensure play works once the new song is ready
-        newAudioPlayer.oncanplaythrough = () => {
-            // Pause any current audio and ensure we have one active audio player at a time
-            if (audioPlayerRef.current) {
-                audioPlayerRef.current.pause();
-            }
-    
-            // Assign the new audio player and play the song
-            audioPlayerRef.current = newAudioPlayer;
-            audioPlayerRef.current.play().catch((error) => {
-                console.error("Error while playing new audio:", error);
-            });
-        };
-    
-        newAudioPlayer.onerror = (error) => {
-            console.error("Audio load error:", error);
-        };
     };
-    
     
     
     const playPreviousSong = () => {
@@ -339,10 +319,21 @@ const App: React.FC = () => {
                 </div>
             </div>
             <div className="audio-player">
-                <audio controls>
+                <audio
+                    ref={audioPlayerRef} // Bind the audio element to the ref
+                    controls
+                    onPlay={() => console.log("Audio playing")}
+                    onPause={() => console.log("Audio paused")}
+                    onLoadedMetadata={() => {
+                        if (audioPlayerRef.current) {
+                            console.log("Duration:", audioPlayerRef.current.duration);
+                        }
+                    }}
+                >
                     <source src={`/audio/${songs[currentSongIndex]}`} type="audio/mp3" />
                 </audio>
             </div>
+
         </div>
     );
 };
